@@ -2,10 +2,18 @@
 const mapCanvas = document.getElementById('map_layer');
 const mapCtx = mapCanvas.getContext('2d');
 
+const keysPressed = {};
+
 // Initial map settings
 let mapX = 0; // Initial x position of the map
 let mapY = 0; // Initial y position of the map
-let zoom = 0.5; // Initial zoom level
+
+const zoom = 0.5; // Initial zoom level
+const maxSpeed = 1;
+const acceleration = 0.02;
+
+let currentSpeed = [0,0];
+let previousSpeed = currentSpeed;
 
 // Map dimensions (assuming the map is larger than the canvas)
 const mapWidth = 246;
@@ -14,6 +22,20 @@ const mapHeight = 205;
 // Map image
 const mapImage = new Image();
 mapImage.src = 'map.png'; // Replace with your map image path
+
+window.addEventListener('keydown', (event) => {
+    keysPressed[event.key] = true;
+});
+  
+// keyupイベントでキーが離されたことを記録
+window.addEventListener('keyup', (event) => {
+    delete keysPressed[event.key];
+});
+  
+// 任意のタイミングでキーが押し込まれているか確認する関数
+function isKeyPressed(key) {
+    return !!keysPressed[key];
+}
 
 // Draw the map based on the current position and zoom
 function drawMap() {
@@ -30,34 +52,81 @@ function drawMap() {
 }
 
 // Handle arrow keys for panning
-function moveMap(event) {
-    const speed = 10 / zoom; // Adjust speed based on zoom level
-    switch (event.key) {
-        case 'ArrowUp':
-            mapY -= speed;
-            break;
-        case 'ArrowDown':
-            mapY += speed;
-            break;
-        case 'ArrowLeft':
-            mapX -= speed;
-            break;
-        case 'ArrowRight':
-            mapX += speed;
-            break;
+function moveMap() {
+    let acceleratingX = 0;
+    let acceleratingY = 0;
+    if(!(isKeyPressed('ArrowUp') || isKeyPressed('w')) && !(isKeyPressed('ArrowDown') || isKeyPressed('s')) && !(isKeyPressed('ArrowLeft') || isKeyPressed('a')) && !(isKeyPressed('ArrowRight') || isKeyPressed('d'))){
+        acceleratingX = 0;
+        acceleratingY = 0;
     }
+    else{
+        if(isKeyPressed('ArrowUp') || isKeyPressed('w')){
+            acceleratingY -= 1;
+        }
+        if(isKeyPressed('ArrowDown') || isKeyPressed('s')){
+            acceleratingY += 1;
+        }
+        if(isKeyPressed('ArrowLeft') || isKeyPressed('a')){
+            acceleratingX -= 1;
+        }
+        if(isKeyPressed('ArrowRight') || isKeyPressed('d')){
+            acceleratingX += 1;
+        }
+    }
+    console.log(`[${acceleratingX},${acceleratingY}]`)
+    updateSpeed(acceleratingX, acceleratingY);
+    mapX += currentSpeed[0];
+    mapY += currentSpeed[1];
     drawMap();
 }
 
-// Handle zoom with mouse wheel
-function zoomMap(event) {
-    const zoomFactor = 0.1; // Zoom speed
-    if (event.deltaY < 0) {
-        zoom = Math.min(2, zoom + zoomFactor); // Zoom in (limit max zoom level)
-    } else {
-        zoom = Math.max(0.5, zoom - zoomFactor); // Zoom out (limit min zoom level)
+function updateSpeed(isAcceleratingX, isAcceleratingY){
+    if(isAcceleratingX == 1){
+        currentSpeed[0] += acceleration;
+        if(currentSpeed[0] > maxSpeed){
+            currentSpeed[0] = maxSpeed;
+        }
+    }else if(isAcceleratingX == -1){
+        currentSpeed[0] -= acceleration;
+        if(currentSpeed[0] < -maxSpeed){
+            currentSpeed[0] = -maxSpeed;
+        }
+    }else{
+        if(currentSpeed[0] > 0){
+            currentSpeed[0] -= acceleration;
+            if(currentSpeed[0] < 0){
+                currentSpeed[0] = 0
+            }
+        }else if(currentSpeed[0] < 0){
+            currentSpeed[0] += acceleration;
+            if(currentSpeed[0] > 0){
+                currentSpeed[0] = 0
+            }
+        }
     }
-    drawMap();
+    if(isAcceleratingY == 1){
+        currentSpeed[1] += acceleration;
+        if(currentSpeed[1] > maxSpeed){
+            currentSpeed[1] = maxSpeed;
+        }
+    }else if(isAcceleratingY == -1){
+        currentSpeed[1] -= acceleration;
+        if(currentSpeed[1] < -maxSpeed){
+            currentSpeed[1] = -maxSpeed;
+        }
+    }else{
+        if(currentSpeed[1] > 0){
+            currentSpeed[1] -= acceleration;
+            if(currentSpeed[1] < 0){
+                currentSpeed[1] = 0
+            }
+        }else if(currentSpeed[1] < 0){
+            currentSpeed[1] += acceleration;
+            if(currentSpeed[1] > 0){
+                currentSpeed[1] = 0
+            }
+        }
+    }
 }
 
 // Load the map image and draw the initial map
@@ -65,6 +134,9 @@ mapImage.onload = () => {
     drawMap();
 };
 
-// Event listeners for key inputs and mouse wheel
-window.addEventListener('keydown', moveMap);
-mapCanvas.addEventListener('wheel', zoomMap);
+function update(){
+    moveMap();
+    console.log(currentSpeed);
+}
+
+setInterval(update, 20);
