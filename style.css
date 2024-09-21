@@ -1,0 +1,13 @@
+#canvas-container {
+    position: relative;
+    width: 800px;
+    height: 600px;
+    overflow: hidden; /* Ensures the map doesn't overflow the container */
+}
+
+
+canvas {
+    position: absolute; /* Stack canvases on top of each other */
+    top: 0;
+    left: 0;
+}
