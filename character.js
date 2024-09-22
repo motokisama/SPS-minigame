@@ -9,8 +9,8 @@ characterImage.src = 'character.png'; // Replace with your character image path
 // Character position and dimensions
 const characterWidth = 50; // Adjust based on character image size
 const characterHeight = 50; // Adjust based on character image size
-const characterX = characterCanvas.width / 2; // Center of the canvas
-const characterY = characterCanvas.height / 2; // Center of the canvas
+let characterX = characterCanvas.width / 2; // Center of the canvas
+let characterY = characterCanvas.height / 2; // Center of the canvas
 
 // Track mouse position
 let mouseX = 0;
@@ -18,7 +18,13 @@ let mouseY = 0;
 
 // Function to draw the character with rotation
 function drawCharacter() {
+    characterX = characterCanvas.width / 2; // Center of the canvas
+    characterY = characterCanvas.height / 2;
     characterCtx.clearRect(0, 0, characterCanvas.width, characterCanvas.height); // Clear the canvas
+
+    characterCtx.beginPath();
+    characterCtx.arc(characterX, characterY, 25, 0, 2 * Math.PI);
+    characterCtx.stroke();
     
     // Calculate the angle between the character center and the mouse position
     const angle = Math.atan2(mouseY - characterY, mouseX - characterX) + Math.PI / 2;
@@ -56,7 +62,11 @@ characterCanvas.addEventListener('mousemove', (event) => {
     drawCharacter();
 });
 
-// Load the character image and draw it initially
-characterImage.onload = () => {
-    drawCharacter();
-};
+function resizeCanvas() {
+    characterCanvas.width = window.innerWidth;
+    characterCanvas.height = window.innerHeight;
+}
+
+window.addEventListener('load', () => {resizeCanvas();drawCharacter();});
+
+window.addEventListener('resize', resizeCanvas);
