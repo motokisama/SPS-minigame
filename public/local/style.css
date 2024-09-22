@@ -5,6 +5,9 @@
     overflow: hidden; /* Ensures the map doesn't overflow the container */
 }
 
+#map_layer {
+    background-color: black;
+}
 
 canvas {
     position: absolute; /* Stack canvases on top of each other */

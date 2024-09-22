@@ -21,7 +21,7 @@ mapImage.src = 'Sample-jpg-image-500kb.jpg'; // Replace with your map image path
 obstacles = [
     { x: 0, y: 0, width: 200, height: 200 },
     { x: 0, y: -50, width: 4350, height: 45},
-    { x: -50, y: 0, width: 60, height: 3585},
+    { x: -50, y: 0, width: 80, height: 3585},
     { x: 0, y: 3585, width: 4350, height: 45},
     { x: 3585, y : 0, width: 50, height: 3585}
 ];
